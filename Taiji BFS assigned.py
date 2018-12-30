@@ -1,12 +1,14 @@
 init=input('初始场景：')
 op=input('黑线设置：')
+target=input('目标设置：')
 n=len(init)
-assert n>0 and len(op)==n
+assert n>0 and len(op)==len(target)==n
 tonum=lambda s:eval('0b%s'%s)
 tobin=lambda i:bin(i)[2:].rjust(n,'0')
-rev_target=(1<<n)-1
+targets=set(tonum(target[i:]+target[:i]) for i in range(n))
 paths=[tonum(op[i:]+op[:i]) for i in range(n)]
 start=tonum(init)
+visited=set()
 track={start:(-1,start)}
 layer=[start]
 solved=False
@@ -19,12 +21,13 @@ while layer:
                 continue
             next_layer.append(next)
             track[next]=(i,prev)
+            visited.add(next)
     layer=next_layer
-    if 0 in track or rev_target in track:
+    if visited&targets:
         solved=True
         break
 if solved:
-    ptr=(rev_target in track) and rev_target
+    ptr=list(visited&targets)[0]
     res=[]
     while ptr!=start:
         node=track[ptr]
